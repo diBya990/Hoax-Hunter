@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Hud from "@/components/Hud";
 import MessageBubble from "@/components/MessageBubble";
@@ -8,14 +8,21 @@ import Meter from "@/components/Meter";
 import PhoneFrame from "@/components/PhoneFrame";
 import { applyAnswer, comboMultiplier, levelOf } from "@/lib/gameState";
 import { useGame } from "@/lib/gameStore";
-import { judge, pickRound, rating, type InboxAction, type Judgement } from "@/lib/inbox";
+import { judge, rating, type InboxAction, type Judgement } from "@/lib/inbox";
 import { RED_FLAGS, getScamType } from "@/lib/scamTypes";
+import { prefetchRound, takeRound, type RoundSource } from "@/lib/scenarioClient";
 import { CHANNEL_LABEL, type Kind, type Scenario } from "@/lib/scenarioTypes";
 import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
 
 // This screen is built to fit the window exactly: nothing here should scroll.
 
-type Phase = "intro" | "answering" | "feedback" | "done";
+type Phase = "intro" | "loading" | "answering" | "feedback" | "done";
+
+const SOURCE_LABEL: Record<RoundSource, { text: string; color: string }> = {
+  ai: { text: "AI-WRITTEN ROUND", color: "#3dffa2" },
+  mixed: { text: "AI + CLASSIC ROUND", color: "#ffc83d" },
+  fallback: { text: "CLASSIC ROUND", color: "#8a9bb8" },
+};
 
 type Outcome = {
   scenario: Scenario;
@@ -80,13 +87,23 @@ export default function InboxGame() {
   const [index, setIndex] = useState(0);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [stats, setStats] = useState<Stats>(EMPTY_STATS);
+  const [source, setSource] = useState<RoundSource>("fallback");
 
-  function start() {
-    setRound(pickRound());
+  // Start fetching a round as soon as the page opens, so START is usually instant.
+  useEffect(() => {
+    prefetchRound();
+  }, []);
+
+  async function start() {
+    setPhase("loading");
+    const loaded = await takeRound();
+    setRound(loaded.scenarios);
+    setSource(loaded.source);
     setIndex(0);
     setOutcome(null);
     setStats(EMPTY_STATS);
     setPhase("answering");
+    prefetchRound(); // get the next round ready while the player plays this one
   }
 
   function choose(action: InboxAction) {
@@ -135,6 +152,24 @@ export default function InboxGame() {
     setPhase("answering");
   }
 
+  // ---------------- loading ----------------
+  if (phase === "loading") {
+    return (
+      <div className="flex h-full min-h-0 flex-col gap-3">
+        <Hud className="" />
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <div className="w-full max-w-md rounded-2xl border border-neon/40 bg-surface/85 p-8 text-center backdrop-blur">
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-neon/20 border-t-neon" />
+            <h2 className="mt-5 text-xl font-bold text-neon">Intercepting messages...</h2>
+            <p className="mt-2 text-sm text-muted">
+              The AI is writing a fresh round for you. This can take a few seconds.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ---------------- intro ----------------
   if (phase === "intro") {
     return (
@@ -145,8 +180,8 @@ export default function InboxGame() {
             <p className="font-mono text-[11px] tracking-[0.3em] text-muted">GAME MODE 1</p>
             <h1 className="title-gradient mt-1 text-4xl font-black">Inbox Defender</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-              10 messages hit your phone, a different mix every round: scams, safe messages
-              and unclear ones. Decide fast and protect your wallet.
+              10 messages hit your phone, written fresh by AI every round: scams, safe
+              messages and unclear ones. Decide fast and protect your wallet.
             </p>
 
             <div className="mt-4 grid gap-3 text-left sm:grid-cols-3">
@@ -234,7 +269,10 @@ export default function InboxGame() {
           <span>
             MESSAGE {index + 1} OF {round.length}
           </span>
-          <span>{stats.correct} CORRECT</span>
+          <span className="flex items-center gap-3">
+            <span style={{ color: SOURCE_LABEL[source].color }}>{SOURCE_LABEL[source].text}</span>
+            <span>{stats.correct} CORRECT</span>
+          </span>
         </div>
         <div className="mt-1.5">
           <Meter value={index + (showResult ? 1 : 0)} max={round.length} color="#22e4ff" />

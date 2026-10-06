@@ -161,19 +161,17 @@ const VARIETY_WORDS = [
   "marketplace",
 ];
 
-/**
- * Asks the AI for `count` fresh scenarios following `plan`.
- * Returns only the ones that passed validation (possibly fewer than asked).
- */
-export async function generateScenarios(
-  count: number,
+/** One AI request for a small batch of scenarios. */
+async function generateChunk(
   plan: KindPlan,
-  focus: ScamTypeId[] = []
+  focus: ScamTypeId[],
+  tag: string
 ): Promise<Scenario[]> {
+  const count = plan.scam + plan.safe + plan.unsure;
   // a few random topics push the AI to vary between requests
   const topics = [...VARIETY_WORDS].sort(() => Math.random() - 0.5).slice(0, 4).join(", ");
 
-  const prompt = `Write exactly ${count} messages: ${plan.scam} scam, ${plan.safe} safe and ${plan.unsure} unsure.
+  const prompt = `Write exactly ${count} messages: ${plan.scam} scam, ${plan.safe} safe and ${plan.unsure} unsure. Follow these numbers exactly.
 ${focus.length ? `Feature these scam types among the scams where possible: ${focus.join(", ")}.\n` : ""}Some topics to draw on this time: ${topics}.
 Put the messages in a shuffled order, not grouped by kind.`;
 
@@ -186,7 +184,7 @@ Put the messages in a shuffled order, not grouped by kind.`;
     const seen = new Set<string>();
     const good: Scenario[] = [];
     list.forEach((item, i) => {
-      const s = cleanOne(item, `ai-${stamp}-${i}`);
+      const s = cleanOne(item, `ai-${stamp}-${tag}-${i}`);
       if (!s || seen.has(s.text)) return;
       seen.add(s.text);
       good.push(s);
@@ -194,4 +192,49 @@ Put the messages in a shuffled order, not grouped by kind.`;
     if (good.length === 0) throw new AIError("The AI's answer was incomplete. Please try again.");
     return good;
   });
+}
+
+/** Splits a plan into two halves so two requests can run at the same time. */
+function splitPlan(plan: KindPlan): [KindPlan, KindPlan] {
+  const a: KindPlan = {
+    scam: Math.ceil(plan.scam / 2),
+    safe: Math.ceil(plan.safe / 2),
+    unsure: Math.ceil(plan.unsure / 2),
+  };
+  const b: KindPlan = {
+    scam: plan.scam - a.scam,
+    safe: plan.safe - a.safe,
+    unsure: plan.unsure - a.unsure,
+  };
+  return [a, b];
+}
+
+/**
+ * Asks the AI for fresh scenarios following `plan`. Large rounds are split into
+ * two requests that run in parallel, which roughly halves the waiting time.
+ * Returns only the scenarios that passed validation (possibly fewer than asked).
+ */
+export async function generateScenarios(
+  count: number,
+  plan: KindPlan,
+  focus: ScamTypeId[] = []
+): Promise<Scenario[]> {
+  const chunks = count > 5 ? splitPlan(plan) : [plan];
+
+  const results = await Promise.allSettled(
+    chunks.map((p, i) => generateChunk(p, focus, String(i)))
+  );
+
+  const scenarios = results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+  if (scenarios.length === 0) {
+    // every request failed: pass on the first error so the caller can explain it
+    const failed = results.find((r) => r.status === "rejected") as PromiseRejectedResult;
+    throw failed.reason;
+  }
+
+  // the two batches are separate, so remove duplicates between them and mix them up
+  const seen = new Set<string>();
+  return scenarios
+    .filter((s) => (seen.has(s.text) ? false : (seen.add(s.text), true)))
+    .sort(() => Math.random() - 0.5);
 }

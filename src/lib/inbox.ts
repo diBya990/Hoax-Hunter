@@ -62,6 +62,36 @@ export function pickRound(): Scenario[] {
   return round;
 }
 
+/**
+ * Makes sure a round has at least `min` of every kind. If the AI ignored the
+ * requested mix, extra messages of the most common kind are swapped for
+ * hand-written ones of the missing kind.
+ */
+export function ensureMinimumMix(round: Scenario[], min = MIN_PER_KIND): Scenario[] {
+  const result = [...round];
+  const kinds: Kind[] = ["scam", "safe", "unsure"];
+  const countOf = (k: Kind) => result.filter((s) => s.kind === k).length;
+  const used = new Set(result.map((s) => s.text));
+
+  for (const missing of kinds) {
+    while (countOf(missing) < min) {
+      // the kind with the most messages gives one up (it must stay above the minimum)
+      const donor = [...kinds].sort((a, b) => countOf(b) - countOf(a))[0];
+      if (countOf(donor) <= min) break;
+
+      const replacement = shuffle(
+        SCENARIOS.filter((s) => s.kind === missing && !used.has(s.text))
+      )[0];
+      const at = result.findIndex((s) => s.kind === donor);
+      if (!replacement || at === -1) break;
+
+      used.add(replacement.text);
+      result[at] = replacement;
+    }
+  }
+  return shuffle(result);
+}
+
 export type Judgement = {
   result: AnswerResult; // what changes in the shared game state
   verdict: Verdict;

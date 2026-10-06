@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AIError } from "@/lib/ai";
 import { generateScenarios, planKinds } from "@/lib/aiScenario";
-import { pickRound } from "@/lib/inbox";
+import { ensureMinimumMix, pickRound } from "@/lib/inbox";
 import { SCAM_TYPES, type ScamTypeId } from "@/lib/scamTypes";
 import type { Scenario } from "@/lib/scenarioTypes";
 
@@ -57,6 +57,12 @@ export async function GET(request: NextRequest) {
     const backup = pickRound().filter((s) => !used.has(s.text));
     scenarios = [...scenarios, ...backup.slice(0, count - scenarios.length)];
   }
+
+  // the AI sometimes ignores the requested mix: keep at least 2 of each kind
+  if (count >= 6) scenarios = ensureMinimumMix(scenarios);
+
+  // be honest about where the messages came from
+  if (source === "ai" && scenarios.some((s) => !s.id.startsWith("ai-"))) source = "mixed";
 
   return NextResponse.json({ scenarios, source, ...(note ? { note } : {}) });
 }

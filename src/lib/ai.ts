@@ -8,14 +8,18 @@
 // A friendly error whose message is safe to show to the player
 export class AIError extends Error {}
 
-// Models to try, in order. If one is busy, we try the next.
+// Models to try, in order. If one is busy or too slow, we try the next.
+// The lite model goes first: in testing it answers in about 3 seconds every time,
+// while the bigger free-tier models were often overloaded or hung for a minute.
 // Override in .env.local with GEMINI_MODEL=model-a,model-b
 const MODELS = (
-  process.env.GEMINI_MODEL ?? "gemini-3.8-flash,gemini-3.5-flash,gemini-flash-lite-latest"
+  process.env.GEMINI_MODEL ?? "gemini-flash-lite-latest,gemini-3.5-flash,gemini-3.8-flash"
 )
   .split(",")
   .map((m) => m.trim())
   .filter(Boolean);
+
+const MODEL_TIMEOUT_MS = 20_000; // longest we wait for one model
 
 type CallOptions = {
   system: string; // the standing instructions
@@ -34,22 +38,31 @@ async function callModel({ system, prompt, schema, temperature = 0.8 }: CallOpti
   let lastProblem = "";
 
   for (const model of MODELS) {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseJsonSchema: schema,
-            temperature,
-          },
-        }),
-      }
-    );
+    let response: Response;
+    try {
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: system }] },
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseJsonSchema: schema,
+              temperature,
+            },
+          }),
+          // a model that hangs is skipped instead of freezing the game
+          signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
+        }
+      );
+    } catch {
+      lastProblem = `${model} timed out or could not be reached`;
+      console.warn(`[ai] ${lastProblem}, trying the next model`);
+      continue;
+    }
 
     // Busy (503), free limit reached (429) or model unavailable (404): try the next model
     if ([404, 429, 500, 503].includes(response.status)) {
