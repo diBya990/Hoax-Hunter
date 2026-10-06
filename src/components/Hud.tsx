@@ -5,13 +5,13 @@ import { levelOf, levelProgress, rankOf, comboMultiplier } from "@/lib/gameState
 import { useGame } from "@/lib/gameStore";
 
 // Compact one-row status bar: level + XP, wallet, trust, streak.
-export default function Hud() {
+export default function Hud({ className = "mt-3" }: { className?: string }) {
   const { game } = useGame();
   const level = levelOf(game.xp);
   const { into, needed } = levelProgress(game.xp);
 
   return (
-    <div className="mx-auto mt-3 flex w-full max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-xl border border-border bg-surface/70 px-4 py-2 backdrop-blur">
+    <div className={`mx-auto ${className} flex w-full max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-xl border border-border bg-surface/70 px-4 py-2 backdrop-blur`}>
       <div className="w-40">
         <div className="flex justify-between font-mono text-[10px] tracking-widest">
           <span className="text-neon">LV {level}</span>

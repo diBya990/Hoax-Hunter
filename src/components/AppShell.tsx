@@ -19,6 +19,8 @@ export default function AppShell({
   const pathname = usePathname();
   const isTitleScreen = pathname === "/";
   const isHub = pathname === "/home";
+  // Game screens fill the window exactly and never scroll.
+  const isGame = pathname === "/play/inbox";
 
   useEffect(() => {
     if (isTitleScreen) return;
@@ -32,12 +34,16 @@ export default function AppShell({
 
   if (isTitleScreen) return <>{children}</>;
 
-  if (isHub) {
+  if (isHub || isGame) {
     return (
       <div className="page-in relative flex h-dvh flex-col overflow-hidden">
-        <MessageCards />
+        {isHub && <MessageCards />}
         <NavBar userName={userName} />
-        <main className="relative z-10 mx-auto min-h-0 w-full max-w-5xl flex-1 px-4 py-4">
+        <main
+          className={`relative z-10 mx-auto min-h-0 w-full flex-1 px-4 ${
+            isGame ? "max-w-6xl py-3" : "max-w-5xl py-4"
+          }`}
+        >
           {children}
         </main>
       </div>

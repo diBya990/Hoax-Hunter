@@ -235,6 +235,50 @@ select {
   }
 }
 
+/* SCAM / SAFE stamp that slams onto the phone */
+.stamp-pop {
+  animation: stamp 0.35s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes stamp {
+  from {
+    transform: rotate(-12deg) scale(2.6);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-12deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* the phone shakes when you get one wrong */
+.shake {
+  animation: shake 0.45s ease;
+}
+@keyframes shake {
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.slide-in {
+  animation: slide-in 0.35s ease-out both;
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
 .page-in {
   animation: page-in 0.5s ease-out;
 }

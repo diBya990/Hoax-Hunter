@@ -112,6 +112,41 @@ export function playClick() {
   tone(c, 2349, t + 0.05, 0.06, "triangle", 0.03); // sparkle
 }
 
+/** Happy two-note chime for a right answer. */
+export function playCorrect() {
+  if (isMuted()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  tone(c, 659.25, t, 0.12, "square", 0.07); // E5
+  tone(c, 987.77, t + 0.1, 0.22, "square", 0.07); // B5
+  tone(c, 1975.5, t + 0.1, 0.2, "triangle", 0.04);
+}
+
+/** Low descending buzz for a wrong answer. */
+export function playWrong() {
+  if (isMuted()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  tone(c, 220, t, 0.25, "sawtooth", 0.09, 90);
+  tone(c, 165, t + 0.12, 0.3, "sawtooth", 0.08, 70);
+}
+
+/** Rising fanfare for a level-up or finishing a round. */
+export function playLevelUp() {
+  if (isMuted()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568].forEach((f, i) => {
+    tone(c, f, t + i * 0.08, 0.22, "square", 0.06);
+  });
+  [523.25, 783.99, 1046.5].forEach((f) => {
+    tone(c, f, t + 0.5, 0.5, "sawtooth", 0.045);
+  });
+}
+
 /** Big power-up for the START button: whoosh, rising sweep, chord, sparkle. */
 export function playStart() {
   if (isMuted()) return;
