@@ -20,7 +20,7 @@ export default function AppShell({
   const isTitleScreen = pathname === "/";
   const isHub = pathname === "/home";
   // Game screens fill the window exactly and never scroll.
-  const isGame = pathname === "/play/inbox";
+  const isGame = pathname === "/play/inbox" || pathname === "/play/chat";
 
   useEffect(() => {
     if (isTitleScreen) return;

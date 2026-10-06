@@ -9,7 +9,9 @@ export default function PhoneFrame({
   overlay,
   className = "h-[560px]",
   footerClassName = "",
+  bodyRef,
 }: {
+  bodyRef?: React.Ref<HTMLDivElement>; // lets a chat scroll its message area to the bottom
   footerClassName?: string; // e.g. "lg:hidden" to hide the footer on wide screens
   className?: string; // sets the height; the default is a fixed 560px
   title: string; // contact name / app name in the header
@@ -36,7 +38,9 @@ export default function PhoneFrame({
       </div>
 
       {/* messages */}
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">{children}</div>
+      <div ref={bodyRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+        {children}
+      </div>
 
       {overlay && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/35">

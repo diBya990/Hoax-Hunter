@@ -10,7 +10,12 @@ const modes = [
     status: "PLAY",
     href: "/play/inbox",
   },
-  { name: "Scammer Chat", text: "Out-talk a live AI scammer.", status: "SOON" },
+  {
+    name: "Scammer Chat",
+    text: "Out-talk a live AI scammer.",
+    status: "PLAY",
+    href: "/play/chat",
+  },
   { name: "Detective", text: "Tap every red flag before time runs out.", status: "SOON" },
   { name: "Boss Fights", text: "Beat one scam master per level.", status: "SOON" },
 ];
