@@ -9,7 +9,13 @@ import { playClick } from "@/lib/sound";
 // Wraps every page. The title screen ("/") is full-screen with no nav bar
 // and no global click sound (it has its own START sound). The hub ("/home")
 // fits exactly in one screen, so it never scrolls.
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({
+  children,
+  userName,
+}: {
+  children: React.ReactNode;
+  userName: string | null;
+}) {
   const pathname = usePathname();
   const isTitleScreen = pathname === "/";
   const isHub = pathname === "/home";
@@ -30,7 +36,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="page-in relative flex h-dvh flex-col overflow-hidden">
         <MessageCards />
-        <NavBar />
+        <NavBar userName={userName} />
         <main className="relative z-10 mx-auto min-h-0 w-full max-w-5xl flex-1 px-4 py-4">
           {children}
         </main>
@@ -40,7 +46,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <NavBar />
+      <NavBar userName={userName} />
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
         {children}
       </main>

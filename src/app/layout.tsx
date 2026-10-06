@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 import Backdrop from "@/components/Backdrop";
+import { getCurrentUser } from "@/lib/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +21,14 @@ export const metadata: Metadata = {
     "Learn to spot scams by playing, and check suspicious messages with AI.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const user = await getCurrentUser();
+  const userName = user
+    ? (user.user_metadata?.full_name as string | undefined) ||
+      user.email?.split("@")[0] ||
+      "Hunter"
+    : null;
+
   return (
     <html
       lang="en"
@@ -28,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <Backdrop />
-        <AppShell>{children}</AppShell>
+        <AppShell userName={userName}>{children}</AppShell>
       </body>
     </html>
   );

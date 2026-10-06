@@ -11,7 +11,7 @@ const links = [
   { href: "/profile", label: "Profile" },
 ];
 
-export default function NavBar() {
+export default function NavBar({ userName }: { userName: string | null }) {
   const muted = useSyncExternalStore(subscribeMuted, isMuted, () => false);
 
   return (
@@ -34,6 +34,33 @@ export default function NavBar() {
               </Link>
             </li>
           ))}
+          {userName ? (
+            <li className="flex items-center gap-3">
+              <span className="hidden max-w-32 truncate font-mono text-sm text-neon md:inline">
+                {userName}
+              </span>
+              <form action="/auth/signout" method="post">
+                <button
+                  type="submit"
+                  className="sfx-btn rounded-md border border-border px-3 py-2 font-mono text-xs sm:text-sm"
+                >
+                  LOG OUT
+                </button>
+              </form>
+            </li>
+          ) : (
+            <li className="flex items-center gap-3">
+              <Link href="/login" className="nav-link font-medium">
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="sfx-btn rounded-md border border-neon px-3 py-2 font-mono text-xs text-neon sm:text-sm"
+              >
+                SIGN UP
+              </Link>
+            </li>
+          )}
           <li>
             <button
               type="button"

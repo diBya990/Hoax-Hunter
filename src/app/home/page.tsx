@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Hud from "@/components/Hud";
 
 type Card = {
   href: string;
@@ -90,6 +91,7 @@ export default function Home() {
         <h1 className="title-gradient hover-title mt-1 text-3xl font-black sm:text-5xl">
           Choose your path
         </h1>
+        <Hud />
       </section>
 
       <section className="scene mx-auto grid min-h-0 w-full max-w-2xl flex-1 grid-cols-2 content-center gap-5 px-2 sm:gap-7">

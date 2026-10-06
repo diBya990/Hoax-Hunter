@@ -1,10 +1,17 @@
-import ComingSoon from "@/components/ComingSoon";
+import { redirect } from "next/navigation";
+import ProfileView from "@/components/ProfileView";
+import { getCurrentUser } from "@/lib/supabase/server";
 
-export default function ProfilePage() {
-  return (
-    <ComingSoon
-      title="Profile"
-      text="Your level, XP, wallet and streak will show up here."
-    />
-  );
+// Needs a logged-in user. src/proxy.ts already redirects visitors, and this
+// check is a second safety net.
+export default async function ProfilePage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login?next=/profile");
+
+  const name =
+    (user.user_metadata?.full_name as string | undefined) ||
+    user.email?.split("@")[0] ||
+    "Hunter";
+
+  return <ProfileView name={name} />;
 }

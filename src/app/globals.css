@@ -388,6 +388,30 @@ select {
   transform: scale(0.95);
 }
 
+/* text inputs in the login / signup forms */
+.field {
+  width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: rgba(4, 7, 13, 0.7);
+  padding: 0.7rem 0.9rem;
+  color: var(--foreground);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--muted) 60%, transparent);
+}
+.field:hover {
+  border-color: color-mix(in srgb, var(--neon) 50%, var(--border));
+}
+.field:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px rgba(34, 228, 255, 0.18);
+}
+
 .logo-hover {
   display: inline-block;
   transition:
