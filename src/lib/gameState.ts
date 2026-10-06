@@ -14,6 +14,7 @@ export type GameState = {
   bestStreak: number;
   answered: number;
   correct: number;
+  bosses: string[]; // ids of the bosses you have defeated
 };
 
 export const DEFAULT_STATE: GameState = {
@@ -24,6 +25,7 @@ export const DEFAULT_STATE: GameState = {
   bestStreak: 0,
   answered: 0,
   correct: 0,
+  bosses: [],
 };
 
 /** One answered question or round, reported by any game mode. */
@@ -81,7 +83,13 @@ export function applyAnswer(s: GameState, r: AnswerResult): GameState {
     bestStreak: Math.max(s.bestStreak, streak),
     answered: s.answered + 1,
     correct: s.correct + (r.correct ? 1 : 0),
+    bosses: s.bosses,
   };
+}
+
+/** Returns the new state with this boss marked as defeated. */
+export function withBossBeaten(s: GameState, bossId: string): GameState {
+  return s.bosses.includes(bossId) ? s : { ...s, bosses: [...s.bosses, bossId] };
 }
 
 /** Makes sure data read from storage is safe to use. */
@@ -99,5 +107,8 @@ export function sanitize(raw: unknown): GameState {
     bestStreak: Math.max(0, num(o.bestStreak, 0)),
     answered: Math.max(0, num(o.answered, 0)),
     correct: Math.max(0, num(o.correct, 0)),
+    bosses: Array.isArray(o.bosses)
+      ? o.bosses.filter((b): b is string => typeof b === "string").slice(0, 20)
+      : [],
   };
 }

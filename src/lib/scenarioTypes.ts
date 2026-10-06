@@ -11,6 +11,10 @@ export type Channel = "sms" | "whatsapp" | "email" | "dm";
 //   unsure -> could be real or fake, best answer is VERIFY
 export type Kind = "scam" | "safe" | "unsure";
 
+// A phrase inside a message that shows a red flag (used by Detective mode).
+// `phrase` is copied exactly from the message text.
+export type Clue = { phrase: string; flag: RedFlagId };
+
 export type Scenario = {
   id: string;
   channel: Channel;
@@ -22,6 +26,7 @@ export type Scenario = {
   redFlags: RedFlagId[]; // warning signs (empty for safe messages)
   explanation: string; // shown after the player answers
   difficulty: 1 | 2 | 3;
+  clues?: Clue[]; // exact phrases that show the red flags (scam messages)
 };
 
 export const CHANNEL_LABEL: Record<Channel, string> = {

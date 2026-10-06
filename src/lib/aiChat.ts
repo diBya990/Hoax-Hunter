@@ -116,7 +116,8 @@ const plain = (text: string) => text.replace(/[<>]/g, "");
 export async function chatTurn(
   persona: Persona,
   history: HistoryItem[],
-  story = ""
+  story = "",
+  maxTurns = MAX_TURNS
 ): Promise<ChatReply> {
   const playerTurns = history.filter((m) => m.from === "player").length;
   const scamName = getScamType(persona.scamType)?.name ?? persona.scamType;
@@ -135,7 +136,7 @@ ${story ? `Private backstory for this chat (keep your details consistent with it
 ${transcript}
 </conversation>
 
-The player has sent ${playerTurns} of a maximum ${MAX_TURNS} messages. Write the scammer's next message and give your verdict on the player's latest message.`;
+The player has sent ${playerTurns} of a maximum ${maxTurns} messages. Write the scammer's next message and give your verdict on the player's latest message.`;
 
   return askAI({ system: SYSTEM, prompt, schema: SCHEMA, temperature: 0.9 }, (raw) => {
     const o = raw as Record<string, unknown>;

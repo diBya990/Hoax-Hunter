@@ -37,11 +37,15 @@ export async function POST(request: NextRequest) {
     return fail("Invalid request.", 400);
   }
 
-  const { personaId, messages, story } = (body ?? {}) as {
+  const { personaId, messages, story, maxTurns } = (body ?? {}) as {
     personaId?: unknown;
     messages?: unknown;
     story?: unknown;
+    maxTurns?: unknown;
   };
+
+  // Boss duels use a shorter chat. The limit is always between 3 and the normal maximum.
+  const turnLimit = Math.min(MAX_TURNS, Math.max(3, Math.floor(Number(maxTurns)) || MAX_TURNS));
 
   const persona = typeof personaId === "string" ? getPersona(personaId) : undefined;
   if (!persona) return fail("Unknown scammer.", 400);
@@ -63,21 +67,21 @@ export async function POST(request: NextRequest) {
 
   const last = history[history.length - 1];
   const playerTurns = history.filter((m) => m.from === "player").length;
-  if (last.from !== "player" || !last.text || playerTurns > MAX_TURNS) {
+  if (last.from !== "player" || !last.text || playerTurns > turnLimit) {
     return fail("Invalid conversation.", 400);
   }
 
   try {
     // the backstory comes from the browser, so keep it short (it is also cleaned inside chatTurn)
     const backstory = typeof story === "string" ? story.slice(0, 300) : "";
-    const reply = await chatTurn(persona, history, backstory);
+    const reply = await chatTurn(persona, history, backstory, turnLimit);
 
     // the turn limit is enforced here, not trusted to the browser
-    if (reply.status === "continue" && playerTurns >= MAX_TURNS) {
+    if (reply.status === "continue" && playerTurns >= turnLimit) {
       return NextResponse.json({
         ...reply,
         status: "survived",
-        reason: `You made it through all ${MAX_TURNS} messages without giving in.`,
+        reason: `You made it through all ${turnLimit} messages without giving in.`,
         lesson:
           "Staying calm and not giving in under pressure is the best defence. Ending the chat early is even safer.",
       });

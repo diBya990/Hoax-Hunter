@@ -60,7 +60,8 @@ export default function AuthForm({ mode, next }: AuthFormProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-2xl border border-neon/40 bg-surface/85 p-8 shadow-[0_0_50px_rgba(34,228,255,0.15)] backdrop-blur">
+    <div className="flex h-full min-h-0 items-center justify-center">
+    <div className="w-full max-w-md rounded-2xl border border-neon/40 bg-surface/85 p-6 shadow-[0_0_50px_rgba(34,228,255,0.15)] backdrop-blur">
       <p className="font-mono text-[11px] tracking-[0.3em] text-muted">
         {isSignup ? "NEW HUNTER" : "WELCOME BACK"}
       </p>
@@ -73,7 +74,7 @@ export default function AuthForm({ mode, next }: AuthFormProps) {
           : "Log in to see your hunter profile."}
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-4 space-y-3">
         {isSignup && (
           <label className="block">
             <span className="mb-1.5 block text-sm text-muted">Hunter name</span>
@@ -135,7 +136,7 @@ export default function AuthForm({ mode, next }: AuthFormProps) {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted">
+      <p className="mt-4 text-center text-sm text-muted">
         {isSignup ? "Already have an account? " : "New here? "}
         <Link
           href={isSignup ? "/login" : "/signup"}
@@ -144,6 +145,7 @@ export default function AuthForm({ mode, next }: AuthFormProps) {
           {isSignup ? "Log in" : "Create an account"}
         </Link>
       </p>
+    </div>
     </div>
   );
 }

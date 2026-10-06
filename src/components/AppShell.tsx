@@ -7,8 +7,7 @@ import MessageCards from "@/components/MessageCards";
 import { playClick } from "@/lib/sound";
 
 // Wraps every page. The title screen ("/") is full-screen with no nav bar
-// and no global click sound (it has its own START sound). The hub ("/home")
-// fits exactly in one screen, so it never scrolls.
+// and no global click sound (it has its own START sound).
 export default function AppShell({
   children,
   userName,
@@ -20,7 +19,7 @@ export default function AppShell({
   const isTitleScreen = pathname === "/";
   const isHub = pathname === "/home";
   // Game screens fill the window exactly and never scroll.
-  const isGame = pathname === "/play/inbox" || pathname === "/play/chat";
+  const isGame = ["/play/inbox", "/play/chat", "/play/detective", "/play/boss"].includes(pathname);
 
   useEffect(() => {
     if (isTitleScreen) return;
@@ -34,28 +33,19 @@ export default function AppShell({
 
   if (isTitleScreen) return <>{children}</>;
 
-  if (isHub || isGame) {
-    return (
-      <div className="page-in relative flex h-dvh flex-col overflow-hidden">
-        {isHub && <MessageCards />}
-        <NavBar userName={userName} />
-        <main
-          className={`relative z-10 mx-auto min-h-0 w-full flex-1 px-4 ${
-            isGame ? "max-w-6xl py-3" : "max-w-5xl py-4"
-          }`}
-        >
-          {children}
-        </main>
-      </div>
-    );
-  }
-
+  // Every page except the title screen fills the window exactly and never scrolls.
+  // Each page is built to fit inside the area below the nav bar.
   return (
-    <>
+    <div className="page-in relative flex h-dvh flex-col overflow-hidden">
+      {isHub && <MessageCards />}
       <NavBar userName={userName} />
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
+      <main
+        className={`relative z-10 mx-auto min-h-0 w-full flex-1 px-4 ${
+          isGame ? "max-w-6xl py-3" : "max-w-5xl py-4"
+        }`}
+      >
         {children}
       </main>
-    </>
+    </div>
   );
 }

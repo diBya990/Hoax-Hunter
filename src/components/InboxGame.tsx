@@ -18,13 +18,13 @@ import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
 
 type Phase = "intro" | "loading" | "answering" | "feedback" | "done";
 
-const SOURCE_LABEL: Record<RoundSource, { text: string; color: string }> = {
+export const SOURCE_LABEL: Record<RoundSource, { text: string; color: string }> = {
   ai: { text: "AI-WRITTEN ROUND", color: "#3dffa2" },
   mixed: { text: "AI + CLASSIC ROUND", color: "#ffc83d" },
   fallback: { text: "CLASSIC ROUND", color: "#8a9bb8" },
 };
 
-type Outcome = {
+export type Outcome = {
   scenario: Scenario;
   judgement: Judgement;
   dXp: number;
@@ -38,7 +38,7 @@ type Outcome = {
 type Stats = { correct: number; xp: number; lost: number; bestStreak: number };
 const EMPTY_STATS: Stats = { correct: 0, xp: 0, lost: 0, bestStreak: 0 };
 
-const ACTIONS: {
+export const ACTIONS: {
   id: InboxAction;
   label: string;
   hint: string;
@@ -72,9 +72,9 @@ const ACTIONS: {
   },
 ];
 
-const VERDICT_COLOR = { great: "#3dffa2", ok: "#ffc83d", wrong: "#ff3d6e" } as const;
+export const VERDICT_COLOR = { great: "#3dffa2", ok: "#ffc83d", wrong: "#ff3d6e" } as const;
 
-const STAMP: Record<Kind, { word: string; color: string }> = {
+export const STAMP: Record<Kind, { word: string; color: string }> = {
   scam: { word: "SCAM", color: "#ff3d6e" },
   safe: { word: "SAFE", color: "#3dffa2" },
   unsure: { word: "VERIFY", color: "#ffc83d" },
@@ -361,14 +361,20 @@ export default function InboxGame() {
   );
 }
 
-function Feedback({
+export function Feedback({
   outcome,
   onNext,
   last,
+  note,
+  extraChips,
+  nextLabel,
 }: {
   outcome: Outcome;
   onNext: () => void;
   last: boolean;
+  note?: string; // e.g. a line spoken by a boss
+  extraChips?: React.ReactNode; // e.g. "-1 heart"
+  nextLabel?: string; // overrides the button text
 }) {
   const { scenario, judgement } = outcome;
   const color = VERDICT_COLOR[judgement.verdict];
@@ -422,7 +428,10 @@ function Feedback({
             LEVEL UP! Level {outcome.newLevel}
           </span>
         )}
+        {extraChips}
       </div>
+
+      {note && <p className="text-[13px] italic text-muted">{note}</p>}
 
       <p className="text-[13px] leading-snug text-foreground">{scenario.explanation}</p>
 
@@ -445,7 +454,7 @@ function Feedback({
         onClick={onNext}
         className="start-btn mt-auto !px-8 !py-2.5 !text-base"
       >
-        {last ? "FINISH ROUND" : "NEXT MESSAGE →"}
+        {nextLabel ?? (last ? "FINISH ROUND" : "NEXT MESSAGE →")}
       </button>
     </div>
   );

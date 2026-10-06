@@ -7,7 +7,7 @@
 
 import { AIError, askAI } from "@/lib/ai";
 import { RED_FLAGS, SCAM_TYPES, type RedFlagId, type ScamTypeId } from "@/lib/scamTypes";
-import type { Channel, Kind, Scenario } from "@/lib/scenarioTypes";
+import type { Channel, Clue, Kind, Scenario } from "@/lib/scenarioTypes";
 
 const CHANNELS: Channel[] = ["sms", "whatsapp", "email", "dm"];
 const KINDS: Kind[] = ["scam", "safe", "unsure"];
@@ -52,6 +52,7 @@ RULES
 - NEVER use real company, brand, bank, government or person names, and never real phone numbers or working websites. Use generic names like "Your Bank", "Courier Service", "HR Careers" or invented first names. Any link must be an obviously fake lookalike address such as secure-bank-verify.co/login.
 - Keep it international: use $ for money and avoid country-specific services.
 - Vary the channel, the topic, the tone and the difficulty. Mix easy and hard ones. Do not copy the examples in these instructions.
+- clues: for scam messages, 2 to 4 short phrases (1 to 8 words each) copied EXACTLY, character for character, from the message text, each showing one red flag (give that flag id). Phrases must not overlap each other. Use an empty list for safe and unsure messages.
 - text: at most 280 characters. subject: only for email, otherwise an empty string.
 - explanation: 1 or 2 simple sentences (reading level of a 13 year old) saying what the real clue is and what the player should do instead.
 - difficulty: 1 (obvious), 2 (needs attention) or 3 (very convincing).
@@ -74,6 +75,17 @@ const SCHEMA = {
           redFlags: { type: "array", items: { type: "string", enum: FLAG_IDS } },
           explanation: { type: "string" },
           difficulty: { type: "integer", minimum: 1, maximum: 3 },
+          clues: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                phrase: { type: "string", description: "Exact words copied from the text." },
+                flag: { type: "string", enum: FLAG_IDS },
+              },
+              required: ["phrase", "flag"],
+            },
+          },
         },
         required: [
           "channel",
@@ -85,6 +97,7 @@ const SCHEMA = {
           "redFlags",
           "explanation",
           "difficulty",
+          "clues",
         ],
       },
     },
@@ -131,6 +144,7 @@ function cleanOne(raw: unknown, id: string): Scenario | null {
   const d = Number(o.difficulty);
   const difficulty = (d === 1 || d === 2 || d === 3 ? d : 2) as 1 | 2 | 3;
   const subject = channel === "email" ? asString(o.subject, 100) : "";
+  const clues = kind === "scam" ? cleanClues(o.clues, text) : [];
 
   return {
     id,
@@ -143,7 +157,35 @@ function cleanOne(raw: unknown, id: string): Scenario | null {
     redFlags,
     explanation,
     difficulty,
+    ...(clues.length ? { clues } : {}),
   };
+}
+
+/**
+ * Keeps only clues whose phrase really appears in the message (ignoring upper
+ * or lower case) and does not overlap another clue. The phrase is re-copied
+ * from the message so its spelling is exact.
+ */
+function cleanClues(raw: unknown, text: string): Clue[] {
+  if (!Array.isArray(raw)) return [];
+  const lower = text.toLowerCase();
+  const taken: [number, number][] = [];
+  const clues: Clue[] = [];
+
+  for (const item of raw) {
+    const phrase = asString((item as { phrase?: unknown })?.phrase, 100);
+    const flag = (item as { flag?: unknown })?.flag;
+    if (!phrase || !FLAG_IDS.includes(flag as RedFlagId)) continue;
+
+    const start = lower.indexOf(phrase.toLowerCase());
+    if (start === -1) continue;
+    const end = start + phrase.length;
+    if (taken.some(([a, b]) => start < b && end > a)) continue; // overlaps another clue
+
+    taken.push([start, end]);
+    clues.push({ phrase: text.slice(start, end), flag: flag as RedFlagId });
+  }
+  return clues.slice(0, 5);
 }
 
 const VARIETY_WORDS = [

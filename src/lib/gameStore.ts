@@ -6,6 +6,7 @@ import {
   DEFAULT_STATE,
   applyAnswer,
   sanitize,
+  withBossBeaten,
   type AnswerResult,
   type GameState,
 } from "@/lib/gameState";
@@ -65,6 +66,8 @@ export function useGame() {
     game,
     /** Report one answered question / round. */
     answer: (r: AnswerResult) => set(applyAnswer(getSnapshot(), r)),
+    /** Mark a boss as defeated (unlocks the next one). */
+    beatBoss: (bossId: string) => set(withBossBeaten(getSnapshot(), bossId)),
     reset: () => set(DEFAULT_STATE),
   };
 }

@@ -1,9 +1,10 @@
 // Hand-written game rounds (global examples, no real company names).
 // Later, AI-generated scenarios use the same Scenario shape.
 
+import { CLUES } from "@/lib/clues";
 import type { Scenario } from "@/lib/scenarioTypes";
 
-export const SCENARIOS: Scenario[] = [
+const BASE_SCENARIOS: Scenario[] = [
   // ---------------- scams ----------------
   {
     id: "bank-1",
@@ -373,3 +374,8 @@ export const SCENARIOS: Scenario[] = [
     difficulty: 2,
   },
 ];
+
+// Attach the Detective-mode clues (see clues.ts) to the scenarios that have them.
+export const SCENARIOS: Scenario[] = BASE_SCENARIOS.map((s) =>
+  CLUES[s.id] ? { ...s, clues: CLUES[s.id] } : s
+);
