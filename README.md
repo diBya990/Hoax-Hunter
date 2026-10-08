@@ -14,6 +14,15 @@ Built solo for **ForgeHacks Online 2026**.
 
 > **Try it in 60 seconds:** open the live app, press **START**, and sign up in the popup (you are logged in straight away, no email confirmation). Then try **Scam Helper** (use the "Fake bank alert" example, then drop in a screenshot of any message) and one round of **Inbox Defender**.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Title screen with 3D phone art](docs/screenshots/01-title-screen.png) | ![Scam Helper showing a 77/100 dangerous result with warning signs and next steps](docs/screenshots/02-scam-helper.png) |
+| **Title screen**: a scam text arrives, the shield and red-flag chips orbit it | **Scam Helper**: risk score, the exact warning signs, what to do now |
+| ![Inbox Defender with an AI-written message and Trust, Verify, Report choices](docs/screenshots/03-inbox-defender.png) | ![Scam Dex collection with one discovered scam and its details](docs/screenshots/04-scam-dex.png) |
+| **Inbox Defender**: an AI-written message, decide how to respond | **Scam Dex**: collect scam types, see your stats and weak spots |
+
 ---
 
 ## The problem
