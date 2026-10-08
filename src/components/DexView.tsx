@@ -66,7 +66,7 @@ export default function DexView() {
       <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
         {/* the collection */}
         <div className={`min-h-0 flex-col gap-3 ${openOnPhone ? "hidden lg:flex" : "flex"}`}>
-          <div className="grid grid-cols-3 content-start gap-2 sm:grid-cols-4 lg:grid-cols-5">
+          <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
             {SCAM_TYPES.map((t) => {
               const st = statusOf(entryOf(t.id));
               const s = STATUS_STYLE[st];
@@ -79,7 +79,7 @@ export default function DexView() {
                     setSelectedId(t.id);
                     setOpenOnPhone(true);
                   }}
-                  className="flex flex-col items-center rounded-xl border bg-surface/80 px-1.5 py-2 text-center transition hover:-translate-y-0.5 active:scale-95"
+                  className="flex flex-col items-center justify-center rounded-xl border bg-surface/80 px-1.5 py-2 text-center transition hover:-translate-y-0.5 active:scale-95"
                   style={{
                     borderColor: active ? "#22e4ff" : st === "locked" ? "var(--border)" : `${s.color}88`,
                     boxShadow: active ? "0 0 18px rgba(34,228,255,0.35)" : undefined,
@@ -104,7 +104,7 @@ export default function DexView() {
           </div>
 
           {/* weak spots */}
-          <div className="rounded-xl border border-border bg-surface/80 p-3">
+          <div className="shrink-0 rounded-xl border border-border bg-surface/80 p-3">
             <p className="font-mono text-[10px] tracking-widest text-muted">YOUR WEAK SPOTS</p>
             {weak.length === 0 ? (
               <p className="mt-1.5 text-xs text-muted">

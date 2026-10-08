@@ -5,6 +5,7 @@ import Link from "next/link";
 import Meter from "@/components/Meter";
 import type { HelperResult } from "@/app/api/analyze/route";
 import { useGame } from "@/lib/gameStore";
+import { sampleMessage, type SampleKind } from "@/lib/helperSamples";
 import { prepareImage, type PreparedImage } from "@/lib/imageUtil";
 import { AI_WEIGHT, RULE_WEIGHT, type Level } from "@/lib/riskEngine";
 import { RED_FLAGS, getScamType, type RedFlagId } from "@/lib/scamTypes";
@@ -12,19 +13,11 @@ import { playClick, playCorrect, playWrong } from "@/lib/sound";
 
 // The Scam Helper screen. It is built to fit the window exactly: nothing here should scroll.
 
-const SAMPLES = [
-  {
-    label: "Fake bank alert",
-    text: "URGENT: Your bank account has been suspended. Verify your identity now: http://secure-bank-login.top/verify",
-  },
-  {
-    label: "Real code message",
-    text: "Your verification code is 482913. Do not share this code with anyone. It expires in 10 minutes.",
-  },
-  {
-    label: "Job offer",
-    text: "Earn $400 per day from home! No experience needed. Just pay a one-time $80 registration fee to get started.",
-  },
+// Each click makes a NEW message of that kind (see helperSamples.ts)
+const SAMPLES: { label: string; kind: SampleKind }[] = [
+  { label: "Fake bank alert", kind: "bank" },
+  { label: "Real code message", kind: "code" },
+  { label: "Job offer", kind: "job" },
 ];
 
 const LEVEL_STYLE: Record<Level, { color: string; title: string; sub: string }> = {
@@ -364,7 +357,7 @@ export default function HelperView() {
               <button
                 key={s.label}
                 type="button"
-                onClick={() => setText(s.text)}
+                onClick={() => setText(sampleMessage(s.kind, text))}
                 className="rounded-full border border-border px-3 py-1 text-[11px] text-muted transition hover:border-neon hover:text-neon"
               >
                 {s.label}
