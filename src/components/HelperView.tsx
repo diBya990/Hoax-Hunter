@@ -112,7 +112,7 @@ function ResultPanel({ r, onBack }: { r: HelperResult; onBack: () => void }) {
             {style.title}
           </p>
           <p className="text-xs text-muted">{style.sub}</p>
-          <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-foreground">{summary}</p>
+          <p className="mt-1 line-clamp-4 text-[13px] leading-snug text-foreground">{summary}</p>
           {scamType && (
             <span className="mt-1.5 inline-block rounded border border-warn px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest text-warn">
               LOOKS LIKE: {scamType.name.toUpperCase()}

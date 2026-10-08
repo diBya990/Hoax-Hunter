@@ -79,7 +79,7 @@ OUTPUT FIELDS
 - verdict: "safe" (score under 30), "suspicious" (30 to 59) or "scam" (60 or more).
 - scamType: one of these ids if it is a scam: ${typeIds}. Use "none" for a safe message and "unclear" if it is suspicious but fits none of them.
 - confidence: "low", "medium" or "high".
-- summary: 1 or 2 plain sentences (reading level of a 13 year old) saying what this message is and why it is or is not risky.
+- summary: ONE short sentence of at most 20 words (reading level of a 13 year old) saying what this message is and why it is or is not risky. Always finish the sentence.
 - flags: the warning signs you found. For each: flag (one of the ids below), evidence (the exact words from the message, copied character for character, at most 12 words), why (one short sentence). Use an empty list for a safe message.
 - nextSteps: 3 or 4 short, concrete actions the person should take now, each under 18 words (for example: do not click the link, open the official app yourself, call the number on your card, block and report the sender). For a safe message, say it looks fine and give one sensible precaution.
 - extractedText: if a screenshot was given, the full text of the message as you read it. Otherwise an empty string.
@@ -117,6 +117,28 @@ const SCHEMA = {
 };
 
 const asText = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+
+/**
+ * Keeps a summary short WITHOUT cutting it in the middle of a sentence: whole
+ * sentences while they fit; otherwise the first sentence cut at its last comma and
+ * finished with a full stop; only as a last resort cut at a word boundary.
+ */
+export function tidySummary(text: string, max = 150): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const sentences = clean.match(/[^.!?]+[.!?]+(?:\s|$)/g) ?? [];
+  let out = "";
+  for (const s of sentences) {
+    if ((out + s).trim().length > max) break;
+    out += s;
+  }
+  if (out.trim()) return out.trim();
+  const head = clean.slice(0, max);
+  const comma = Math.max(head.lastIndexOf(","), head.lastIndexOf(";"));
+  if (comma > max * 0.5) return head.slice(0, comma).trim() + ".";
+  const cut = clean.slice(0, max).replace(/\s+\S*$/, "").replace(/[,;:\s]+$/, "");
+  return cut + "...";
+}
 
 export async function analyzeWithAI(
   input: { text: string; image?: { mimeType: string; data: string } },
@@ -163,7 +185,7 @@ ${messageBlock}${input.image ? "\nA screenshot of the message is attached." : ""
       const o = raw as Record<string, unknown>;
       if (!o || typeof o !== "object") throw new AIError("The analysis was incomplete. Please try again.");
 
-      const summary = asText(o.summary, 400);
+      const summary = tidySummary(asText(o.summary, 800));
       if (!summary) throw new AIError("The analysis was incomplete. Please try again.");
 
       const score = Math.min(100, Math.max(0, Math.round(Number(o.score))));
