@@ -9,7 +9,7 @@ Built solo for **ForgeHacks Online 2026**.
 | | |
 |---|---|
 | **Live app** | https://hoax-hunter.vercel.app |
-| **Demo video** | _(link added at submission)_ |
+| **Demo video** | https://youtu.be/975nvrM_rgg |
 | **Code** | https://github.com/diBya990/Hoax-Hunter |
 
 > **Try it in 60 seconds:** open the live app, press **START**, and sign up in the popup (you are logged in straight away, no email confirmation). Then try **Scam Helper** (use the "Fake bank alert" example, then drop in a screenshot of any message) and one round of **Inbox Defender**.
