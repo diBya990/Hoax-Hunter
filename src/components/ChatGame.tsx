@@ -51,7 +51,7 @@ const FALLBACK_REASON: Record<"blocked", { reason: string; lesson: string }> = {
 };
 
 export default function ChatGame() {
-  const { game, answer } = useGame();
+  const { game, answer, recordDex } = useGame();
   const [phase, setPhase] = useState<Phase>("pick");
   const [persona, setPersona] = useState<Persona | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -122,6 +122,7 @@ export default function ChatGame() {
     const leveledUp = levelOf(next.xp) > levelOf(game.xp);
 
     answer(result);
+    recordDex(p.scamType, status === "lost" ? "fell" : "caught");
     if (status === "lost") playWrong();
     else playCorrect();
     if (leveledUp) setTimeout(playLevelUp, 350);

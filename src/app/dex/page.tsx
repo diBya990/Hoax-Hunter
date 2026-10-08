@@ -1,10 +1,8 @@
-import ComingSoon from "@/components/ComingSoon";
+import type { Metadata } from "next";
+import DexView from "@/components/DexView";
+
+export const metadata: Metadata = { title: "Scam Dex · Hoax Hunter" };
 
 export default function DexPage() {
-  return (
-    <ComingSoon
-      title="Scam Dex"
-      text="Your collection of scam types and your weak spots will show up here."
-    />
-  );
+  return <DexView />;
 }

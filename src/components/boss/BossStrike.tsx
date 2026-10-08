@@ -8,6 +8,7 @@ import { W_STRIKE, pick, type Boss } from "@/lib/bosses";
 import { clueOfWord, clueRanges, evaluate, judgeDetective, splitWords } from "@/lib/detective";
 import { applyAnswer, comboMultiplier, levelOf } from "@/lib/gameState";
 import { useGame } from "@/lib/gameStore";
+import { getScamType } from "@/lib/scamTypes";
 import { CHANNEL_LABEL, type Scenario } from "@/lib/scenarioTypes";
 import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
 
@@ -39,7 +40,7 @@ export default function BossStrike({
   bossLine,
   setBossLine,
 }: Props) {
-  const { game, answer } = useGame();
+  const { game, answer, recordDex } = useGame();
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"playing" | "reveal">("playing");
   const [selected, setSelected] = useState<number[]>([]);
@@ -66,6 +67,9 @@ export default function BossStrike({
     const lose = judgement.verdict === "wrong";
 
     answer(judgement.result);
+    if (scenario.kind === "scam" && getScamType(scenario.scamType)) {
+      recordDex(scenario.scamType, lose ? "fell" : "caught");
+    }
     if (lose) playWrong();
     else playCorrect();
     if (leveledUp) setTimeout(playLevelUp, 350);

@@ -269,6 +269,16 @@ select {
   }
 }
 
+/* the risk gauge fills up when a result appears */
+.gauge-ring {
+  animation: gauge-fill 1s ease-out;
+}
+@keyframes gauge-fill {
+  from {
+    stroke-dasharray: 0 var(--circ);
+  }
+}
+
 /* "the scammer is typing" dots */
 .typing-dot {
   width: 6px;

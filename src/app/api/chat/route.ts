@@ -9,6 +9,10 @@ import { getPersona } from "@/lib/personas";
 
 export const dynamic = "force-dynamic";
 
+// The AI can take a while on the free tier. Without this, Vercel's free plan would cut the
+// request off after about 10 seconds. (Our own time budget in ai.ts is 22 seconds.)
+export const maxDuration = 60;
+
 const MAX_MESSAGES = 2 * MAX_TURNS + 2;
 const MAX_TEXT = 400;
 

@@ -203,6 +203,19 @@ const VARIETY_WORDS = [
   "marketplace",
 ];
 
+/**
+ * How strongly to steer the scam types. One focus type (a Scam Dex practice
+ * round) means ALL scams are that type, each with a different story. Several
+ * types (a boss's favourites) means at least half the scams use them.
+ */
+function focusInstruction(focus: ScamTypeId[], scamCount: number): string {
+  if (focus.length === 0 || scamCount === 0) return "";
+  if (focus.length === 1) {
+    return `All ${scamCount} scam messages must be the scam type "${focus[0]}". Make each one a different story with a different channel, tone, sender and difficulty, so the player learns the many faces of this scam.\n`;
+  }
+  return `At least ${Math.ceil(scamCount / 2)} of the ${scamCount} scam messages must use these scam types: ${focus.join(", ")}. Vary the stories.\n`;
+}
+
 /** One AI request for a small batch of scenarios. */
 async function generateChunk(
   plan: KindPlan,
@@ -214,7 +227,7 @@ async function generateChunk(
   const topics = [...VARIETY_WORDS].sort(() => Math.random() - 0.5).slice(0, 4).join(", ");
 
   const prompt = `Write exactly ${count} messages: ${plan.scam} scam, ${plan.safe} safe and ${plan.unsure} unsure. Follow these numbers exactly.
-${focus.length ? `Feature these scam types among the scams where possible: ${focus.join(", ")}.\n` : ""}Some topics to draw on this time: ${topics}.
+${focusInstruction(focus, plan.scam)}Some topics to draw on this time: ${topics}.
 Put the messages in a shuffled order, not grouped by kind.`;
 
   const stamp = Date.now().toString(36);

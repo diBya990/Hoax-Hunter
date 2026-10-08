@@ -6,6 +6,14 @@ export const START_TRUST = 70;
 export const XP_PER_LEVEL = 200;
 export const MAX_COMBO = 5; // streak bonus stops growing after this many in a row
 
+// What you have done with one scam type (used by the Scam Dex).
+export type DexEntry = {
+  caught: number; // times you spotted or resisted it in a game
+  fell: number; // times you fell for it in a game
+  helper: number; // times the Scam Helper found it in a message you checked
+};
+export type DexOutcome = "caught" | "fell" | "helper";
+
 export type GameState = {
   xp: number;
   wallet: number; // money you have not lost to scammers yet
@@ -15,6 +23,7 @@ export type GameState = {
   answered: number;
   correct: number;
   bosses: string[]; // ids of the bosses you have defeated
+  dex: Record<string, DexEntry>; // per scam type: what you have met and how you did
 };
 
 export const DEFAULT_STATE: GameState = {
@@ -26,6 +35,7 @@ export const DEFAULT_STATE: GameState = {
   answered: 0,
   correct: 0,
   bosses: [],
+  dex: {},
 };
 
 /** One answered question or round, reported by any game mode. */
@@ -84,12 +94,31 @@ export function applyAnswer(s: GameState, r: AnswerResult): GameState {
     answered: s.answered + 1,
     correct: s.correct + (r.correct ? 1 : 0),
     bosses: s.bosses,
+    dex: s.dex,
   };
+}
+
+/** Returns the new state with one more encounter written into the Scam Dex. */
+export function withDexRecord(s: GameState, typeId: string, outcome: DexOutcome): GameState {
+  const old = s.dex[typeId] ?? { caught: 0, fell: 0, helper: 0 };
+  return { ...s, dex: { ...s.dex, [typeId]: { ...old, [outcome]: old[outcome] + 1 } } };
 }
 
 /** Returns the new state with this boss marked as defeated. */
 export function withBossBeaten(s: GameState, bossId: string): GameState {
   return s.bosses.includes(bossId) ? s : { ...s, bosses: [...s.bosses, bossId] };
+}
+
+function sanitizeDex(raw: unknown): Record<string, DexEntry> {
+  const dex: Record<string, DexEntry> = {};
+  if (typeof raw !== "object" || raw === null) return dex;
+  const count = (v: unknown) =>
+    typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
+  for (const [id, entry] of Object.entries(raw).slice(0, 50)) {
+    const e = (entry ?? {}) as Record<string, unknown>;
+    dex[id] = { caught: count(e.caught), fell: count(e.fell), helper: count(e.helper) };
+  }
+  return dex;
 }
 
 /** Makes sure data read from storage is safe to use. */
@@ -110,5 +139,6 @@ export function sanitize(raw: unknown): GameState {
     bosses: Array.isArray(o.bosses)
       ? o.bosses.filter((b): b is string => typeof b === "string").slice(0, 20)
       : [],
+    dex: sanitizeDex(o.dex),
   };
 }

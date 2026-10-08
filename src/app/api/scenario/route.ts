@@ -20,6 +20,10 @@ import type { Scenario } from "@/lib/scenarioTypes";
 
 export const dynamic = "force-dynamic";
 
+// The AI can take a while on the free tier. Without this, Vercel's free plan would cut the
+// request off after about 10 seconds. (Our own time budget in ai.ts is 22 seconds.)
+export const maxDuration = 60;
+
 const MAX_COUNT = 10;
 
 // Very simple per-visitor limit so nobody can drain the free AI quota.

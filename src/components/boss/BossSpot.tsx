@@ -9,6 +9,7 @@ import { W_SPOT, pick, spotCount, type Boss, type RuleId } from "@/lib/bosses";
 import { applyAnswer, comboMultiplier, levelOf, type AnswerResult } from "@/lib/gameState";
 import { useGame } from "@/lib/gameStore";
 import { judge, type InboxAction, type Judgement } from "@/lib/inbox";
+import { getScamType } from "@/lib/scamTypes";
 import { CHANNEL_LABEL, type Scenario } from "@/lib/scenarioTypes";
 import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
 
@@ -80,7 +81,7 @@ export default function BossSpot({
   bossLine,
   setBossLine,
 }: Props) {
-  const { game, answer } = useGame();
+  const { game, answer, recordDex } = useGame();
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"answering" | "feedback">("answering");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -151,6 +152,9 @@ export default function BossSpot({
     const next = applyAnswer(game, judgement.result);
     const leveledUp = levelOf(next.xp) > levelOf(game.xp);
     answer(judgement.result);
+    if (scenario.kind === "scam" && getScamType(scenario.scamType)) {
+      recordDex(scenario.scamType, correct ? "caught" : "fell");
+    }
 
     if (correct) playCorrect();
     else playWrong();

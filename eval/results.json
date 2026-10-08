@@ -1,0 +1,409 @@
+{
+  "rows": [
+    {
+      "id": "s01",
+      "label": "scam",
+      "hard": false,
+      "rule": 69,
+      "ai": 95,
+      "blended": 85,
+      "source": "hybrid"
+    },
+    {
+      "id": "s02",
+      "label": "scam",
+      "hard": false,
+      "rule": 68,
+      "ai": 90,
+      "blended": 81,
+      "source": "hybrid"
+    },
+    {
+      "id": "s03",
+      "label": "scam",
+      "hard": false,
+      "rule": 65,
+      "ai": 90,
+      "blended": 80,
+      "source": "hybrid"
+    },
+    {
+      "id": "s04",
+      "label": "scam",
+      "hard": false,
+      "rule": 70,
+      "ai": 95,
+      "blended": 85,
+      "source": "hybrid"
+    },
+    {
+      "id": "s05",
+      "label": "scam",
+      "hard": false,
+      "rule": 38,
+      "ai": 95,
+      "blended": 72,
+      "source": "hybrid"
+    },
+    {
+      "id": "s06",
+      "label": "scam",
+      "hard": false,
+      "rule": 65,
+      "ai": 90,
+      "blended": 80,
+      "source": "hybrid"
+    },
+    {
+      "id": "s07",
+      "label": "scam",
+      "hard": true,
+      "rule": 52,
+      "ai": 90,
+      "blended": 75,
+      "source": "hybrid"
+    },
+    {
+      "id": "s08",
+      "label": "scam",
+      "hard": false,
+      "rule": 61,
+      "ai": 90,
+      "blended": 78,
+      "source": "hybrid"
+    },
+    {
+      "id": "s09",
+      "label": "scam",
+      "hard": false,
+      "rule": 79,
+      "ai": 95,
+      "blended": 89,
+      "source": "hybrid"
+    },
+    {
+      "id": "s10",
+      "label": "scam",
+      "hard": false,
+      "rule": 73,
+      "ai": 95,
+      "blended": 86,
+      "source": "hybrid"
+    },
+    {
+      "id": "s11",
+      "label": "scam",
+      "hard": true,
+      "rule": 52,
+      "ai": 95,
+      "blended": 78,
+      "source": "hybrid"
+    },
+    {
+      "id": "s12",
+      "label": "scam",
+      "hard": false,
+      "rule": 68,
+      "ai": 95,
+      "blended": 84,
+      "source": "hybrid"
+    },
+    {
+      "id": "s13",
+      "label": "scam",
+      "hard": false,
+      "rule": 47,
+      "ai": 90,
+      "blended": 73,
+      "source": "hybrid"
+    },
+    {
+      "id": "s14",
+      "label": "scam",
+      "hard": false,
+      "rule": 61,
+      "ai": 90,
+      "blended": 78,
+      "source": "hybrid"
+    },
+    {
+      "id": "s15",
+      "label": "scam",
+      "hard": false,
+      "rule": 47,
+      "ai": 90,
+      "blended": 73,
+      "source": "hybrid"
+    },
+    {
+      "id": "s16",
+      "label": "scam",
+      "hard": true,
+      "rule": 27,
+      "ai": 85,
+      "blended": 62,
+      "source": "hybrid"
+    },
+    {
+      "id": "s17",
+      "label": "scam",
+      "hard": false,
+      "rule": 72,
+      "ai": 90,
+      "blended": 83,
+      "source": "hybrid"
+    },
+    {
+      "id": "s18",
+      "label": "scam",
+      "hard": false,
+      "rule": 50,
+      "ai": 95,
+      "blended": 77,
+      "source": "hybrid"
+    },
+    {
+      "id": "s19",
+      "label": "scam",
+      "hard": true,
+      "rule": 41,
+      "ai": 90,
+      "blended": 70,
+      "source": "hybrid"
+    },
+    {
+      "id": "s20",
+      "label": "scam",
+      "hard": true,
+      "rule": 33,
+      "ai": 85,
+      "blended": 64,
+      "source": "hybrid"
+    },
+    {
+      "id": "n01",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n02",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n03",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n04",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n05",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n06",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n07",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n08",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n09",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n10",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n11",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n12",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n13",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 5,
+      "blended": 3,
+      "source": "hybrid"
+    },
+    {
+      "id": "n14",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n15",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n16",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n17",
+      "label": "safe",
+      "hard": false,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    },
+    {
+      "id": "n18",
+      "label": "safe",
+      "hard": true,
+      "rule": 7,
+      "ai": 5,
+      "blended": 6,
+      "source": "hybrid"
+    },
+    {
+      "id": "n19",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 5,
+      "blended": 3,
+      "source": "hybrid"
+    },
+    {
+      "id": "n20",
+      "label": "safe",
+      "hard": true,
+      "rule": 0,
+      "ai": 0,
+      "blended": 0,
+      "source": "hybrid"
+    }
+  ],
+  "results": {
+    "rules": {
+      "n": 40,
+      "skipped": 0,
+      "accuracy": 0.925,
+      "catchRate": 0.85,
+      "falseAlarm": 0,
+      "precision": 1,
+      "tp": 17,
+      "fp": 0,
+      "tn": 20,
+      "fn": 3,
+      "wrong": [
+        "s05(38)",
+        "s16(27)",
+        "s20(33)"
+      ]
+    },
+    "ai": {
+      "n": 40,
+      "skipped": 0,
+      "accuracy": 1,
+      "catchRate": 1,
+      "falseAlarm": 0,
+      "precision": 1,
+      "tp": 20,
+      "fp": 0,
+      "tn": 20,
+      "fn": 0,
+      "wrong": []
+    },
+    "blended": {
+      "n": 40,
+      "skipped": 0,
+      "accuracy": 1,
+      "catchRate": 1,
+      "falseAlarm": 0,
+      "precision": 1,
+      "tp": 20,
+      "fp": 0,
+      "tn": 20,
+      "fn": 0,
+      "wrong": []
+    }
+  }
+}

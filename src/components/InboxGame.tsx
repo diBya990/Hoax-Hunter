@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Hud from "@/components/Hud";
 import MessageBubble from "@/components/MessageBubble";
@@ -8,9 +8,10 @@ import Meter from "@/components/Meter";
 import PhoneFrame from "@/components/PhoneFrame";
 import { applyAnswer, comboMultiplier, levelOf } from "@/lib/gameState";
 import { useGame } from "@/lib/gameStore";
-import { judge, rating, type InboxAction, type Judgement } from "@/lib/inbox";
-import { RED_FLAGS, getScamType } from "@/lib/scamTypes";
-import { prefetchRound, takeRound, type RoundSource } from "@/lib/scenarioClient";
+import { ROUND_SIZE, judge, pickRound, rating, type InboxAction, type Judgement } from "@/lib/inbox";
+import { buildRound } from "@/lib/rounds";
+import { RED_FLAGS, getScamType, type ScamTypeId } from "@/lib/scamTypes";
+import { prefetch, take, type RoundSource } from "@/lib/scenarioClient";
 import { CHANNEL_LABEL, type Kind, type Scenario } from "@/lib/scenarioTypes";
 import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
 
@@ -80,8 +81,21 @@ export const STAMP: Record<Kind, { word: string; color: string }> = {
   unsure: { word: "VERIFY", color: "#ffc83d" },
 };
 
-export default function InboxGame() {
-  const { game, answer } = useGame();
+// Where a round comes from. In practice mode (from the Scam Dex) the round is
+// built around one scam type.
+function roundSource(focus?: ScamTypeId) {
+  return focus
+    ? {
+        url: `/api/scenario?count=${ROUND_SIZE}&mix=6,2,2&focus=${focus}`,
+        fallback: () => buildRound([], { scam: 6, safe: 2, unsure: 2 }, { focus: [focus] }).scenarios,
+      }
+    : { url: `/api/scenario?count=${ROUND_SIZE}`, fallback: pickRound };
+}
+
+export default function InboxGame({ focus }: { focus?: ScamTypeId }) {
+  const { game, answer, recordDex } = useGame();
+  const src = useMemo(() => roundSource(focus), [focus]);
+  const focusName = focus ? getScamType(focus)?.name : undefined;
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState<Scenario[]>([]);
   const [index, setIndex] = useState(0);
@@ -91,19 +105,19 @@ export default function InboxGame() {
 
   // Start fetching a round as soon as the page opens, so START is usually instant.
   useEffect(() => {
-    prefetchRound();
-  }, []);
+    prefetch(src.url, ROUND_SIZE, src.fallback);
+  }, [src]);
 
   async function start() {
     setPhase("loading");
-    const loaded = await takeRound();
+    const loaded = await take(src.url, ROUND_SIZE, src.fallback);
     setRound(loaded.scenarios);
     setSource(loaded.source);
     setIndex(0);
     setOutcome(null);
     setStats(EMPTY_STATS);
     setPhase("answering");
-    prefetchRound(); // get the next round ready while the player plays this one
+    prefetch(src.url, ROUND_SIZE, src.fallback); // get the next round ready while the player plays this one
   }
 
   function choose(action: InboxAction) {
@@ -117,6 +131,9 @@ export default function InboxGame() {
     const leveledUp = levelOf(next.xp) > levelOf(game.xp);
 
     answer(judgement.result);
+    if (scenario.kind === "scam" && getScamType(scenario.scamType)) {
+      recordDex(scenario.scamType, judgement.result.correct ? "caught" : "fell");
+    }
 
     if (judgement.verdict === "wrong") playWrong();
     else playCorrect();
@@ -177,7 +194,9 @@ export default function InboxGame() {
         <Hud className="" />
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div className="w-full max-w-2xl rounded-2xl border border-neon/40 bg-surface/85 p-6 text-center backdrop-blur">
-            <p className="font-mono text-[11px] tracking-[0.3em] text-muted">GAME MODE 1</p>
+            <p className="font-mono text-[11px] tracking-[0.3em] text-muted">
+              {focusName ? `PRACTICE: ${focusName.toUpperCase()}` : "GAME MODE 1"}
+            </p>
             <h1 className="title-gradient mt-1 text-4xl font-black">Inbox Defender</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted">
               10 messages hit your phone, written fresh by AI every round: scams, safe

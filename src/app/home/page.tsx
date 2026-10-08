@@ -1,5 +1,8 @@
 import Link from "next/link";
+import AuthModal from "@/components/AuthModal";
 import Hud from "@/components/Hud";
+import { safeNext } from "@/lib/safeNext";
+import { getCurrentUser } from "@/lib/supabase/server";
 
 type Card = {
   href: string;
@@ -81,7 +84,15 @@ const cards: Card[] = [
   },
 ];
 
-export default function Home() {
+// The hub. Nobody gets in without logging in: a visitor who is not logged in
+// only sees the login / sign-up popup (it cannot be closed).
+export default async function Home(props: PageProps<"/home">) {
+  const user = await getCurrentUser();
+  if (!user) {
+    const { next } = await props.searchParams;
+    return <AuthModal next={safeNext(next)} />;
+  }
+
   return (
     <div className="flex h-full flex-col">
       <section className="shrink-0 pt-2 text-center">

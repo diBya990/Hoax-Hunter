@@ -24,7 +24,9 @@ export default function NavBar({ userName }: { userName: string | null }) {
           HOAX//HUNTER
         </Link>
         <ul className="flex items-center gap-3 text-sm text-muted sm:gap-7 sm:text-lg">
-          {links.map((l) => (
+          {/* the menu is only for logged-in players */}
+          {userName &&
+            links.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
@@ -48,19 +50,7 @@ export default function NavBar({ userName }: { userName: string | null }) {
                 </button>
               </form>
             </li>
-          ) : (
-            <li className="flex items-center gap-3">
-              <Link href="/login" className="nav-link font-medium">
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="sfx-btn rounded-md border border-neon px-3 py-2 font-mono text-xs text-neon sm:text-sm"
-              >
-                SIGN UP
-              </Link>
-            </li>
-          )}
+          ) : null}
           <li>
             <button
               type="button"

@@ -19,25 +19,41 @@ const MODELS = (
   .map((m) => m.trim())
   .filter(Boolean);
 
-const MODEL_TIMEOUT_MS = 20_000; // longest we wait for one model
+const MODEL_TIMEOUT_MS = 15_000; // longest we wait for one model
+const TOTAL_BUDGET_MS = 22_000; // longest we spend on all models together, then we give up
 
 type CallOptions = {
   system: string; // the standing instructions
   prompt: string; // this request
   schema: object; // the exact JSON shape we want back
   temperature?: number; // higher = more creative and varied
+  image?: { mimeType: string; data: string }; // an optional picture (base64) for the AI to look at
 };
 
 // Sends the request to Gemini and returns the raw JSON text.
-async function callModel({ system, prompt, schema, temperature = 0.8 }: CallOptions): Promise<string> {
+async function callModel({
+  system,
+  prompt,
+  schema,
+  temperature = 0.8,
+  image,
+}: CallOptions): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new AIError("The AI isn't connected yet. Add GEMINI_API_KEY to .env.local and restart the app.");
   }
 
   let lastProblem = "";
+  const startedAt = Date.now();
 
   for (const model of MODELS) {
+    // out of time: stop trying more models, so the player is not kept waiting
+    const remaining = TOTAL_BUDGET_MS - (Date.now() - startedAt);
+    if (remaining < 3_000) {
+      lastProblem = "ran out of time";
+      break;
+    }
+
     let response: Response;
     try {
       response = await fetch(
@@ -47,7 +63,17 @@ async function callModel({ system, prompt, schema, temperature = 0.8 }: CallOpti
           headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: system }] },
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  { text: prompt },
+                  ...(image
+                    ? [{ inlineData: { mimeType: image.mimeType, data: image.data } }]
+                    : []),
+                ],
+              },
+            ],
             generationConfig: {
               responseMimeType: "application/json",
               responseJsonSchema: schema,
@@ -55,7 +81,7 @@ async function callModel({ system, prompt, schema, temperature = 0.8 }: CallOpti
             },
           }),
           // a model that hangs is skipped instead of freezing the game
-          signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
+          signal: AbortSignal.timeout(Math.min(MODEL_TIMEOUT_MS, remaining)),
         }
       );
     } catch {

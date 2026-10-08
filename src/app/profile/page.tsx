@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/supabase/server";
 // check is a second safety net.
 export default async function ProfilePage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login?next=/profile");
+  if (!user) redirect("/home?next=/profile");
 
   const name =
     (user.user_metadata?.full_name as string | undefined) ||

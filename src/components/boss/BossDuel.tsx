@@ -6,6 +6,7 @@ import Meter from "@/components/Meter";
 import PhoneFrame from "@/components/PhoneFrame";
 import { W_DUEL, type Boss } from "@/lib/bosses";
 import type { ChatMsg, ChatReply, ChatStatus } from "@/lib/chat";
+import { useGame } from "@/lib/gameStore";
 import { randomOpener, type Persona } from "@/lib/personas";
 import { RED_FLAGS, type RedFlagId } from "@/lib/scamTypes";
 import { CHANNEL_LABEL } from "@/lib/scenarioTypes";
@@ -26,6 +27,7 @@ type Props = {
 type Verdict = { status: ChatStatus; reason: string; lesson: string };
 
 export default function BossDuel({ boss, persona, maxTurns, onDamage, onWon, onLost }: Props) {
+  const { recordDex } = useGame();
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [pressure, setPressure] = useState(15);
   const [tactics, setTactics] = useState<RedFlagId[]>([]);
@@ -304,7 +306,11 @@ export default function BossDuel({ boss, persona, maxTurns, onDamage, onWon, onL
               </div>
               <button
                 type="button"
-                onClick={lost ? onLost : onWon}
+                onClick={() => {
+                  recordDex(persona.scamType, lost ? "fell" : "caught");
+                  if (lost) onLost();
+                  else onWon();
+                }}
                 className="start-btn mt-auto !px-8 !py-2.5 !text-base"
               >
                 {lost ? "FACE DEFEAT" : "DELIVER THE FINAL BLOW →"}

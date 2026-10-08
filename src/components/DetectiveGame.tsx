@@ -21,7 +21,7 @@ import {
 } from "@/lib/detective";
 import { applyAnswer, comboMultiplier, levelOf } from "@/lib/gameState";
 import { useGame } from "@/lib/gameStore";
-import { RED_FLAGS } from "@/lib/scamTypes";
+import { RED_FLAGS, getScamType } from "@/lib/scamTypes";
 import { prefetch, take, type RoundSource } from "@/lib/scenarioClient";
 import { CHANNEL_LABEL, type Scenario } from "@/lib/scenarioTypes";
 import { playCorrect, playLevelUp, playWrong } from "@/lib/sound";
@@ -47,7 +47,7 @@ const EMPTY_STATS: Stats = { found: 0, total: 0, correct: 0, xp: 0 };
 const VERDICT_COLOR = { great: "#3dffa2", ok: "#ffc83d", wrong: "#ff3d6e" } as const;
 
 export default function DetectiveGame() {
-  const { game, answer } = useGame();
+  const { game, answer, recordDex } = useGame();
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState<Scenario[]>([]);
   const [source, setSource] = useState<RoundSource>("fallback");
@@ -94,6 +94,9 @@ export default function DetectiveGame() {
     const leveledUp = levelOf(next.xp) > levelOf(game.xp);
 
     answer(judgement.result);
+    if (scenario.kind === "scam" && getScamType(scenario.scamType)) {
+      recordDex(scenario.scamType, judgement.result.correct ? "caught" : "fell");
+    }
     if (judgement.verdict === "wrong") playWrong();
     else playCorrect();
     if (leveledUp) setTimeout(playLevelUp, 350);

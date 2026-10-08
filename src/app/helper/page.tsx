@@ -1,10 +1,8 @@
-import ComingSoon from "@/components/ComingSoon";
+import type { Metadata } from "next";
+import HelperView from "@/components/HelperView";
+
+export const metadata: Metadata = { title: "Scam Helper · Hoax Hunter" };
 
 export default function HelperPage() {
-  return (
-    <ComingSoon
-      title="Scam Helper"
-      text="Paste a suspicious message, link or screenshot and get a risk score here."
-    />
-  );
+  return <HelperView />;
 }

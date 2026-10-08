@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 import Backdrop from "@/components/Backdrop";
+import GameUserSync from "@/components/GameUserSync";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 const geistSans = Geist({
@@ -34,7 +35,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" data-user-id={user?.id ?? ""}>
+        <GameUserSync userId={user?.id ?? null} />
         <Backdrop />
         <AppShell userName={userName}>{children}</AppShell>
       </body>
